@@ -1,44 +1,52 @@
 const Node = require('./node');
 
 class LinkedList {
+
     constructor() {
-        head = new Node();
-        tail = new Node();
+        this._head = null;
+        this._tail = null;
+        this.length = 0;
     }
+
 
     append(data) {
 
-        newElement = new Node(data);
+        if (this.isEmpty()) {
 
-        if (isEmpty()) {
-            head = tail = newElement;
-        } else if (head.next === null) {
-            tail = newElement;
-            tail.prev = head;
-            head.next = tail;
+            this._head = this._tail = new Node(data);
+
+        } else if (this.length === 1) {
+
+            this._tail = new Node(data);
+            this._tail.prev = this._head;
+            this._head.next = this._tail;
+
         } else {
-            tail.next = newElement;
-            newElement.prev = tail;
-            tail = newElement;
+
+            this._tail.next = new Node(data);
+            this._tail.next.prev = this._tail;
+            this._tail = this._tail.next;
         }
 
-        ++idx;
+        ++this.length;
+
+        return this;
     }
 
-    head() {return head;}
+    head() {return this._head.data;}
 
-    tail() {return tail;}
+    tail() {return this._tail.data;}
 
     at(index) {
 
-        if (index > idx || index < 0) {
+        if (index > this.length || index < 0) {
 
             alert("List doesn't include this index");
             return -1;
 
         } else {
 
-        temp = head;
+        var temp = this._head;
 
         for (var i = 0; i < index; ++i) {
             temp = temp.next;
@@ -50,63 +58,69 @@ class LinkedList {
 
     insertAt(index, data) {
 
-        if (index > idx || index < 0) {
+        if (index > this.length || index < 0) {
 
             alert("List doesn't include this index");
             return -1;
 
         } else {
+            if (this.isEmpty()) {
 
-        temp = head;
+                this._head = this._tail = new Node(data);
 
-        for (var i = 0; i < index; ++i) {
-            temp = temp.next;
+            } else {
+
+                var temp = this._head;
+
+                for (var i = 0; i < index; ++i) {
+                    temp = temp.next;
+                }
+
+                var newElement = new Node(data, temp.prev, temp);
+                ++this.length;
+                temp.prev.next = newElement;
+                temp.prev = newElement;
+
+            }
+
+
         }
 
-        newElement = new Node(data, temp.prev, temp);
-        ++idx;
-        temp.prev.next = newElement;
-        temp.prev = newElement;
-
-        }
+        return this;
 
     }
 
-    isEmpty() {return (idx===0);}
+    isEmpty() {return (this.length === 0);}
 
     clear() {
 
-        while (head.next !== null) {
-
-            temp = head.next;
-            delete head;
-            head = temp;
+        if (this.length !== 0) {
+            this._head.data = null;
+            this._tail.data = null;
+            this.length = 0;
         }
 
-        delete head;
+        return this;
     }
 
     deleteAt(index) {
 
-        if (index > idx || index < 0) {
+        if (index > this.length || index < 0) {
 
             alert("List doesn't include this index");
             return -1;
         }
 
-        temp = head;
+        var temp = this._head;
 
         if (index === 0) {
 
-            temp = head.next;
-            delete head;
-            head = temp;
+            this._head = this._head.next;
 
-        } else if (index === idx) {
+        } else if (index === this.length) {
 
-            temp = tail.prev;
-            delete tail;
-            tail = temp;
+            this._tail.prev.next = null;
+            this._tail = this._tail.prev;
 
         } else {
 
@@ -116,47 +130,44 @@ class LinkedList {
 
             temp.prev.next = temp.next;
             temp.next.prev = temp.prev;
-            delete temp;
+            temp = null;
 
         }
 
-        return 0;        
+        --this.length;
+
+        return this;
     }
 
     reverse() {
 
-        temp = head;
+        var length = this.length;
+        for (var i = 0; i < length - 1; ++i) {
+            if (i === 0) {
 
-        while (temp.next !== null) {
+                this.append(this.at(i));
 
-            temp = temp.next;
-            tempRef = temp.next;
-            temp.next = temp.prev;
-            temp.prev = tempRef;
+            } else {
 
+                this.insertAt(this.length-i,this.at(i));
+            }
         }
 
-        head.prev = head.next;
-        head.next = null;
+        for (var i = 0; i < length - 1; ++i) {
+            this.deleteAt(0);
+        }
 
-        tail.next = tail.prev;
-        tail.prev = null;
-
-        temp = head;
-        head = tail;
-        tail = temp;
-
+        return this;
     }
 
     indexOf(data) {
 
-        temp = head;
-        for (var i = 0; i < idx; ++i) {
+        var temp = this._head;
+        for (var i = 0; i < this.length; ++i) {
 
             if (temp.data === data) {
                return i;
-            } else if ((temp.data !== data) && (i === idx - 1)) {
-                alert("List doesn't contain this data");
+            } else if ((temp.data !== data) && (i === this.length - 1)) {
                 return -1;
             } else {
                  temp = temp.next;
@@ -164,8 +175,8 @@ class LinkedList {
             
         }
 
-
     }
 }
+
 
 module.exports = LinkedList;
